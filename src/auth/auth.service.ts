@@ -1,12 +1,13 @@
 import { Injectable } from '@nestjs/common';
+import * as bcrypt from 'bcrypt';
 
 @Injectable()
 export class AuthService {
   
-  // Fungsi ini dibuat persis seperti rancangan Sequence Diagram kita
-  register(nama: string, email: string, sandi: string, terms_accepted: boolean) {
+  // Menambahkan 'async' karena proses enkripsi membutuhkan waktu
+  async register(nama: string, email: string, sandi: string, terms_accepted: boolean) {
     
-    // Validasi 1: Syarat dan ketentuan harus dicentang
+    // 1. Validasi Syarat & Ketentuan
     if (!terms_accepted) {
       return { 
         status: 'error', 
@@ -14,7 +15,7 @@ export class AuthService {
       };
     }
 
-    // Validasi 2: Email, nama, dan password tidak boleh kosong
+    // 2. Validasi Kelengkapan Data
     if (!nama || !email || !sandi) {
       return { 
         status: 'error', 
@@ -22,11 +23,17 @@ export class AuthService {
       };
     }
 
-    // Jika semua validasi lolos, simpan ke Database (simulasi)
-    // Sesuai ERD kita, data akan dipecah ke tabel 'Users' dan 'Credentials'
+    // 3. Proses Keamanan: Enkripsi Kata Sandi (Hashing)
+    const saltRounds = 10;
+    const hashedPassword = await bcrypt.hash(sandi, saltRounds);
+
+    // Simulasi log terminal untuk membuktikan sandi berhasil diacak
+    console.log(`[DATABASE MOCK] Menyimpan User: ${email}`);
+    console.log(`[DATABASE MOCK] Sandi Tersimpan: ${hashedPassword}`);
+
     return { 
       status: 'success', 
-      message: `Pendaftaran berhasil! Akun dengan email ${email} telah dibuat.` 
+      message: `Pendaftaran berhasil! Akun dengan email ${email} telah siap digunakan.` 
     };
   }
 }
